@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %} Billing Page {% endblock %}
+{% block divContent %}
+<form action="#" method="post">
+    <div class="form-group">
+        <label for="from-date">From Sales Date</label>
+        <input type="date" id="from-date" name="from-date" class="form-control" format="dd/mm/yyyy" placeholder="DD/MM/YYYY">
+    </div>
+    <div class="form-group">
+        <label for="to-date">From Sales Date</label>
+        <input type="date" id="to-date" name="to-date" class="form-control" format="dd/mm/yyyy" placeholder="DD/MM/YYYY">
+    </div>
+    <button type="submit" value="submit" class="btn btn-primary">Get Sales Within Date Range</button>
+</form><br><br>
+Sales data from: {{ from_date }} to {{ to_date }}
+{% if sales_list|length>0 %}
+<table class="table">
+    <thead class="thead-light">
+    <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Price</th>
+        <th scope="col">Count</th>
+        <th scope="col">Amount</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for item in sales_list.keys() %}
+    <tr>
+        <td>{{ item.split("_")[0] }}</td>
+        <td>{{ item.split("_")[1] }}</td>
+        <td>{{ sales_list[item] }}</td>
+        <td>{{ (item.split("_")[1]|int|abs) *(sales_list[item]|int|abs) }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% endblock %}

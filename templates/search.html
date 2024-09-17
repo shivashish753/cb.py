@@ -1,0 +1,116 @@
+{% if filtered_list|length>0 %}
+<table class="table">
+    <thead class="thead-light">
+    <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Price</th>
+        <th scope="col" colspan="2">Operation</th>
+    </tr>
+    </thead>
+    <tbody>
+{% for item in filtered_list %}
+<tr>
+    <td>{{ item.item_name }}</td>
+    <td>{{ item.price }}</td>
+    <td> <button class="btn btn-success" onclick="add('{{ item.item_name }}_{{ item.price }}')"> Add </button></td>
+    <td> <button class="btn btn-danger" onclick="subtract('{{ item.item_name }}_{{ item.price }}')"> Subtract </button></td>
+</tr>
+{% endfor %}
+    </tbody>
+</table>
+<h2 id="order_summary_header"></h2>
+<table class="table">
+    <thead class="thead-light" id="order_details_header">
+    </thead>
+    <tbody id="order_details_body">
+    </tbody>
+</table>
+
+<script>
+    function add(value) {
+        // Check browser support
+        if (typeof(Storage) !== "undefined") {
+          if (localStorage.getItem(value) == null) {
+               localStorage.setItem(value, 1);
+          } else {
+                localStorage.setItem(value, Number(localStorage.getItem(value))+1)
+          }
+          render_div();
+        } else {
+          let key = Object.keys(localStorage);
+
+          document.getElementById("result").innerHTML = "Sorry, your browser does not support Web Storage...";
+        }
+    }
+
+    function subtract(value) {
+        // Check browser support
+        if (typeof(Storage) !== "undefined") {
+            if (localStorage.getItem(value) != null) {
+                if(localStorage.getItem(value) == 1) {
+                   localStorage.removeItem(value)
+                } else {
+                    localStorage.setItem(value, Number(localStorage.getItem(value))-1)
+                }
+            }
+            render_div();
+        } else {
+
+          document.getElementById("result").innerHTML = "Sorry, your browser does not support Web Storage...";
+        }
+    }
+
+    function checkout() {
+        fetch("http://127.0.0.1:5000/order/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(localStorage)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response;
+        })
+        .then(() => {
+            alert('Order placed successfully!');
+            localStorage.clear();
+            render_div();
+        })
+        .catch(error => {
+        console.log(error);
+            alert('Error sending data!');
+        });
+    }
+
+    function render_div() {
+        let keys  = Object.keys(localStorage);
+        let render_html="";
+        let order_detail_header="";
+        let orders_header="";
+        let total = 0;
+        if(keys.length>0) {
+          orders_header += "Order Summary!"
+          order_detail_header += "<tr>";
+          order_detail_header += '<th scope="col">Name</th>';
+          order_detail_header += '<th scope="col">Price</th>';
+          order_detail_header += '<th scope="col">Count</th>';
+          order_detail_header += "</tr>";
+          document.getElementById("order_details_header").innerHTML = order_detail_header;
+          for (let i=0; i<localStorage.length; i++) {
+            render_html += "<tr><td>"+keys[i].split("_")[0]+"</td>";
+            render_html += "<td>"+keys[i].split("_")[1]+"</td>";
+            total += Number(keys[i].split("_")[1])*Number(localStorage.getItem(keys[i]));
+            render_html += "<td>"+localStorage.getItem(keys[i])+"</td></tr>";
+          }
+          render_html += "<tr><td>Total:</td><td colspan='2'>"+total+"</td></tr>";
+          render_html += '<tr><td colspan="3"><button class="btn btn-info" onclick="checkout()" id="postDataBtn">Checkout!</button></td></tr>'
+        }
+        document.getElementById("order_summary_header").innerHTML = orders_header;
+        document.getElementById("order_details_header").innerHTML = order_detail_header;
+        document.getElementById("order_details_body").innerHTML = render_html;
+    }
+</script>
+{% endif %}

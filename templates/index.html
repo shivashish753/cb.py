@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %} Billing Page {% endblock %}
+{% block searchbar %}
+<div class="form-group" style="padding : 1em 2em 0 2em;">
+    <input type="text" class="form-control" placeholder="Search" name="q" hx-get="/search/" hx-trigger="keyup changed delay:500ms" hx-target="#results">
+</div>
+{% endblock %}
+{% block divContent %}{% endblock %}
+{% block divContent2 %}
+{% endblock %}
