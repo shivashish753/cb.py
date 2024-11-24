@@ -12,8 +12,8 @@
 <tr>
     <td>{{ item.item_name }}</td>
     <td>{{ item.price }}</td>
-    <td> <button class="btn btn-success" onclick="add('{{ item.item_name }}_{{ item.price }}')"> Add </button></td>
-    <td> <button class="btn btn-danger" onclick="subtract('{{ item.item_name }}_{{ item.price }}')"> Subtract </button></td>
+    <td> <button class="btn btn-success" onclick="add('{{ item.item_name }}_{{ item.price }}', '{{ base_url }}')"> Add </button></td>
+    <td> <button class="btn btn-danger" onclick="subtract('{{ item.item_name }}_{{ item.price }}', '{{  base_url }}')"> Subtract </button></td>
 </tr>
 {% endfor %}
     </tbody>
@@ -27,7 +27,7 @@
 </table>
 
 <script>
-    function add(value) {
+    function add(value, base_url) {
         // Check browser support
         if (typeof(Storage) !== "undefined") {
           if (localStorage.getItem(value) == null) {
@@ -35,6 +35,7 @@
           } else {
                 localStorage.setItem(value, Number(localStorage.getItem(value))+1)
           }
+          localStorage.setItem("baseUrl", base_url)
           render_div();
         } else {
           let key = Object.keys(localStorage);
@@ -53,6 +54,7 @@
                     localStorage.setItem(value, Number(localStorage.getItem(value))-1)
                 }
             }
+            localStorage.setItem("baseUrl", base_url)
             render_div();
         } else {
 
@@ -61,7 +63,9 @@
     }
 
     function checkout() {
-        fetch("http://127.0.0.1:5000/order/", {
+        let base_ur = localStorage.getItem("baseUrl");
+        localStorage.removeItem("baseUrl")
+        fetch(base_ur+"/order/", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -100,10 +104,12 @@
           order_detail_header += "</tr>";
           document.getElementById("order_details_header").innerHTML = order_detail_header;
           for (let i=0; i<localStorage.length; i++) {
-            render_html += "<tr><td>"+keys[i].split("_")[0]+"</td>";
-            render_html += "<td>"+keys[i].split("_")[1]+"</td>";
-            total += Number(keys[i].split("_")[1])*Number(localStorage.getItem(keys[i]));
-            render_html += "<td>"+localStorage.getItem(keys[i])+"</td></tr>";
+            if (keys[i] != "baseUrl") {
+                render_html += "<tr><td>"+keys[i].split("_")[0]+"</td>";
+                render_html += "<td>"+keys[i].split("_")[1]+"</td>";
+                total += Number(keys[i].split("_")[1])*Number(localStorage.getItem(keys[i]));
+                render_html += "<td>"+localStorage.getItem(keys[i])+"</td></tr>";
+            }
           }
           render_html += "<tr><td>Total:</td><td colspan='2'>"+total+"</td></tr>";
           render_html += '<tr><td colspan="3"><button class="btn btn-info" onclick="checkout()" id="postDataBtn">Checkout!</button></td></tr>'
