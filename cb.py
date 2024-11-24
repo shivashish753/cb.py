@@ -149,4 +149,4 @@ def search():
     else:
         filtered_menu_data = []
 
-    return render_template("search.html", filtered_list=filtered_menu_data)
+    return render_template("search.html", filtered_list=filtered_menu_data, base_url=request.base_url.replace("/search/", ""))
