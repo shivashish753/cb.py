@@ -2,10 +2,10 @@
   "version": 2,
   "builds": [
       {
-          "src": "cb.py",
+          "src": "*.py",
           "use": "@vercel/python"
       }
-  ]
+  ],
   "routes": [
       {
           "src": "(.*)",
