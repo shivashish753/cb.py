@@ -104,7 +104,7 @@
           order_detail_header += "</tr>";
           document.getElementById("order_details_header").innerHTML = order_detail_header;
           for (let i=0; i<localStorage.length; i++) {
-            if (keys[i] != "baseUrl") {
+            if (keys[i].split("_").length==2) {
                 render_html += "<tr><td>"+keys[i].split("_")[0]+"</td>";
                 render_html += "<td>"+keys[i].split("_")[1]+"</td>";
                 total += Number(keys[i].split("_")[1])*Number(localStorage.getItem(keys[i]));
