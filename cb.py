@@ -150,7 +150,3 @@ def search():
         filtered_menu_data = []
 
     return render_template("search.html", filtered_list=filtered_menu_data)
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
